@@ -112,8 +112,8 @@ class DiagnosticAgentService {
 
 // Create singleton instance
 export const diagnosticAgent = new DiagnosticAgentService(
-  import.meta.env.VITE_REACT_APP_DIAGNOSTIC_API_URL || '/api/diagnostic',
-  import.meta.env.VITE_REACT_APP_DIAGNOSTIC_API_KEY
+  process.env.REACT_APP_DIAGNOSTIC_API_URL || '/api/diagnostic',
+  process.env.REACT_APP_DIAGNOSTIC_API_KEY
 );
 
 // Mock data for development/demo purposes
