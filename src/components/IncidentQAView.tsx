@@ -66,6 +66,39 @@ export function IncidentQAView() {
   const generateResponse = (userQuery: string): ChatMessage => {
     const lowerQuery = userQuery.toLowerCase();
     
+    if (lowerQuery.includes('sli breach') || lowerQuery.includes('root cause') || 
+        lowerQuery.includes('bugrootcauseagent') || lowerQuery.includes('analyze') && lowerQuery.includes('breach')) {
+      return {
+        id: Date.now().toString(),
+        type: 'assistant',
+        content: 'Based on the analysis from the BugRootCauseAgent, the root cause of the latency spike in the auth-service at 12:30 UTC appears to be:\n\n1. A NullPointerException in the AuthController due to an uninitialized session variable when accessing user data. The suggested resolution is to initialize the session variable before accessing user data, following the steps from issue #101.\n\n2. Timeouts from the database connection pool being exhausted during high volumes of user logins. To address this, the BugRootCauseAgent recommends increasing the size of the database connection pool or optimizing the connection pooling implementation to handle higher loads.\n\n3. Lack of robust error handling and fallback mechanisms when database connections fail, leading to poor user experience during high load scenarios. Implementing better error handling and fallbacks is advised.',
+        timestamp: new Date().toISOString(),
+        results: [
+          {
+            id: 'rca-001',
+            type: 'insight',
+            title: 'NullPointerException in AuthController',
+            description: 'Uninitialized session variable causing authentication failures',
+            confidence: 95
+          },
+          {
+            id: 'rca-002',
+            type: 'insight',
+            title: 'Database Connection Pool Exhaustion',
+            description: 'High volume of logins overwhelming connection pool capacity',
+            confidence: 88
+          },
+          {
+            id: 'rca-003',
+            type: 'insight',
+            title: 'Insufficient Error Handling',
+            description: 'Lack of fallback mechanisms during database connection failures',
+            confidence: 82
+          }
+        ]
+      };
+    }
+
     if (lowerQuery.includes('incident') && lowerQuery.includes('24 hours')) {
       return {
         id: Date.now().toString(),

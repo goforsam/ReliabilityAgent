@@ -85,6 +85,17 @@ export function DashboardView({ spikeData, metricData, onExplainClick, diagnosti
         <p className="text-sm text-red-700 dark:text-red-300 mt-1">
           Latency spike detected in {spikeData.service} at {new Date(spikeData.timestamp).toLocaleTimeString()} UTC
         </p>
+        <div className="mt-3">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('analyze-sli-breach', { 
+              detail: { service: spikeData.service, timestamp: spikeData.timestamp, value: spikeData.value }
+            }))}
+            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+          >
+            <AlertTriangle className="w-4 h-4" />
+            <span>Analyze the SLI breach and figure out the root cause</span>
+          </button>
+        </div>
       </div>
 
       {/* Service Status */}
