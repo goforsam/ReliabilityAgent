@@ -363,4 +363,43 @@ export function IncidentQAView() {
             <div className="flex justify-start">
               <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-2"></div>
+                    <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input Form */}
+        <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+          <form onSubmit={handleSubmit} className="flex space-x-3">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ask about incidents, SLOs, metrics, or system performance..."
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                disabled={isLoading}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!query.trim() || isLoading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              <Send className="w-4 h-4" />
+              <span>Send</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
