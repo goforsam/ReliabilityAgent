@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, MessageCircle, Clock, TrendingUp, AlertTriangle, CheckCircle, Zap, Database, Server, Users, Search } from 'lucide-react';
 
 interface QueryResult {
@@ -39,6 +39,41 @@ export function IncidentQAView() {
     "Which services have the most incidents?",
     "Show me database connection issues"
   ];
+
+  // Auto-analyze on mount and interval
+  useEffect(() => {
+    // Listen for SLI breach analysis events
+    const handleSLIBreachAnalysis = (event: CustomEvent) => {
+      const query = "Analyze the SLI breach and figure out the root cause";
+      setQuery(query);
+      
+      // Auto-submit the query
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: query,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+      setIsLoading(true);
+
+      setTimeout(() => {
+        const assistantMessage = generateResponse(query);
+        setMessages(prev => [...prev, assistantMessage]);
+        setIsLoading(false);
+        
+        // Navigate to incident-qa view
+        window.dispatchEvent(new CustomEvent('navigate-to-incident-qa'));
+      }, 1500);
+    };
+
+    window.addEventListener('analyze-sli-breach', handleSLIBreachAnalysis as EventListener);
+    
+    return () => {
+      window.removeEventListener('analyze-sli-breach', handleSLIBreachAnalysis as EventListener);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -328,45 +363,4 @@ export function IncidentQAView() {
             <div className="flex justify-start">
               <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Input Form */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-          <form onSubmit={handleSubmit} className="flex space-x-4">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ask about incidents, SLOs, or system performance..."
-                className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                disabled={isLoading}
-              />
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            </div>
-            <button
-              type="submit"
-              disabled={!query.trim() || isLoading}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-            >
-              <Send className="w-4 h-4" />
-              <span>Send</span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue

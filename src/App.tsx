@@ -70,10 +70,27 @@ function App() {
 
   // Auto-start analysis simulation
   useEffect(() => {
+    // Listen for navigation events
+    const handleNavigateToIncidentQA = () => {
+      setActiveSection('incident-qa');
+    };
+    
+    const handleNavigateToDiagnostics = () => {
+      setActiveSection('diagnostics');
+    };
+
+    window.addEventListener('navigate-to-incident-qa', handleNavigateToIncidentQA);
+    window.addEventListener('navigate-to-diagnostics', handleNavigateToDiagnostics);
+
     const timer = setTimeout(() => {
       setAnalysisStarted(true);
     }, 1000);
-    return () => clearTimeout(timer);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('navigate-to-incident-qa', handleNavigateToIncidentQA);
+      window.removeEventListener('navigate-to-diagnostics', handleNavigateToDiagnostics);
+    };
   }, []);
 
   const handleExplainClick = () => {
