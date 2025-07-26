@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Settings, Moon, Sun } from 'lucide-react';
+import { Bell, Settings, Moon, Sun, AlertTriangle } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { DashboardView } from './components/DashboardView';
 import { AIAnalysisView } from './components/AIAnalysisView';
 import { IncidentsView } from './components/IncidentsView';
 import { IncidentQAView } from './components/IncidentQAView';
+import { DiagnosticPanel } from './components/DiagnosticPanel';
 import { useTheme } from './contexts/ThemeContext';
+import { useDiagnosticAgent } from './hooks/useDiagnosticAgent';
 
 function App() {
   const [analysisStarted, setAnalysisStarted] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa' | 'diagnostics'>('dashboard');
   const { isDarkMode, toggleDarkMode } = useTheme();
+  
+  // Diagnostic agent integration
+  const {
+    diagnosticData,
+    isAnalyzing,
+    analyzeDashboard,
+    analyzeSpecificIssue,
+    submitFeedback,
+    hasIssues,
+    criticalIssues,
+    overallHealth
+  } = useDiagnosticAgent({ autoAnalyze: true, interval: 60000 });
 
   // MVP scenario data
   const spikeData = {
@@ -80,6 +94,20 @@ function App() {
               </h2>
               
               <div className="flex items-center space-x-4">
+                {/* Diagnostic Health Indicator */}
+                {hasIssues && (
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      overallHealth === 'critical' ? 'bg-red-500' :
+                      overallHealth === 'warning' ? 'bg-yellow-500' :
+                      'bg-green-500'
+                    }`}></div>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {criticalIssues.length > 0 ? `${criticalIssues.length} critical issues` : 'Issues detected'}
+                    </span>
+                  </div>
+                )}
+                
                 <button 
                   onClick={toggleDarkMode}
                   className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-200"
@@ -89,7 +117,9 @@ function App() {
                 </button>
                 <button className="relative p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-200">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                  {(hasIssues || criticalIssues.length > 0) && (
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
                 </button>
                 <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-200">
                   <Settings className="w-5 h-5" />
@@ -115,6 +145,8 @@ function App() {
               spikeData={spikeData} 
               metricData={metricData} 
               onExplainClick={handleExplainClick}
+              diagnosticData={diagnosticData}
+              onAnalyzeIssue={analyzeSpecificIssue}
             />
           ) : activeSection === 'ai-analysis' ? (
             <AIAnalysisView
@@ -126,6 +158,13 @@ function App() {
             />
           ) : activeSection === 'incident-qa' ? (
             <IncidentQAView />
+          ) : activeSection === 'diagnostics' ? (
+            <DiagnosticPanel
+              issues={diagnosticData?.issues || []}
+              isAnalyzing={isAnalyzing}
+              onAnalyze={analyzeDashboard}
+              onSubmitFeedback={submitFeedback}
+            />
           ) : (
             <IncidentsView />
           )}

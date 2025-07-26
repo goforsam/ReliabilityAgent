@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TrendingUp, AlertTriangle, HelpCircle } from 'lucide-react';
 
 interface DataPoint {
@@ -15,9 +15,16 @@ interface MetricChartProps {
 }
 
 export function MetricChart({ data, threshold, spikeValue, title, onExplainClick }: MetricChartProps) {
-  const maxValue = Math.max(...data.map(d => d.value), spikeValue);
-  const minValue = Math.min(...data.map(d => d.value));
-  const range = maxValue - minValue;
+  // Optimize with useMemo for better performance
+  const chartData = useMemo(() => {
+    const maxValue = Math.max(...data.map(d => d.value), spikeValue);
+    const minValue = Math.min(...data.map(d => d.value));
+    const range = maxValue - minValue;
+    
+    return { maxValue, minValue, range };
+  }, [data, spikeValue]);
+  
+  const { maxValue, minValue, range } = chartData;
   
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-200">

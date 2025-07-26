@@ -1,9 +1,9 @@
 import React from 'react';
-import { BarChart3, Brain, ChevronRight, AlertTriangle, MessageCircle } from 'lucide-react';
+import { BarChart3, Brain, ChevronRight, AlertTriangle, MessageCircle, Stethoscope } from 'lucide-react';
 
 interface SidebarProps {
-  activeSection: 'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa';
-  onSectionChange: (section: 'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa') => void;
+  activeSection: 'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa' | 'diagnostics';
+  onSectionChange: (section: 'dashboard' | 'ai-analysis' | 'incidents' | 'incident-qa' | 'diagnostics') => void;
 }
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -31,6 +31,12 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
       name: 'Incident Q&A',
       icon: MessageCircle,
       description: 'Natural language query interface'
+    },
+    {
+      id: 'diagnostics' as const,
+      name: 'Dashboard Diagnostics',
+      icon: Stethoscope,
+      description: 'AI-powered performance analysis'
     }
   ];
 
